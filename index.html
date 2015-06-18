@@ -3,10 +3,8 @@
 <head>
 <title>필스너 ㅊㅋㅊㅋ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!--link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"-->
   <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular.min.js"></script>
-  <!--script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script-->
   <script lang="javascript">
   var app = angular.module('forpilApp',[]);
   app.controller('forpilCtrl',function($scope, $interval){
@@ -21,11 +19,130 @@
     },1000);
   });
   </script>
+  <style type="text/css">
+  body{
+    width:100%; 
+    overflow:hidden;
+    margin:0;
+
+    cursor: pointer;
+  }
+  </style>
+
 </head>
+
 <body ng-controller="forpilCtrl">
-{{days}} 일<br/>
- = {{hour}} 시간<br/>
- = {{min}} 분<br/>
- = {{sec}} 초<br/>
+<div id="daycounter" style="height: 20px;">{{days}} 일 = {{hour}} 시간 = {{min}} 분 = {{sec}} 초</div>
+
+
+<canvas id = 'canv'></canvas>
+<!--
+Mousemove to expand, then click for variations [ don't click too fast ].
+Touch enabled but works best w/mouse. 
+!-->
+<script language="javascript">
+window.requestAnimFrame = (function() {
+  return window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function(callback) {
+      window.setTimeout(callback, 1000 / 60);
+    };
+})();
+
+var c = document.getElementById('canv');
+var canv = c.getContext('2d');
+var w = c.width = window.innerWidth;
+var h = c.height = window.innerHeight - 20;
+
+var s = 12;
+var off_r = 80;
+var rad = 40;
+var morph = rad;
+var dist = 0;
+var targ = dist;
+var t = 0;
+var prevX, prevY;
+var ŭ = 0;
+var mid_x = w * 0.5;
+var mid_y = h * 0.5;
+
+function calc_(p, a, b) {
+  return a + (b - a) * p;
+}
+function draw() {
+  t = 0;
+  prevX = prevY = undefined;
+
+  rad += (morph - rad) * 0.02;
+  dist += (targ - dist) * 0.04;
+  ŭ -= .5;
+
+  canv.globalAlpha = .2;
+  canv.globalCompositeOperation = "source-over";
+  canv.fillRect(0, 0, w, h);
+  canv.globalAlpha = .5;
+  canv.globalCompositeOperation = "lighter";
+  canv.beginPath();
+/*
+purposely not a 'perfect' heart shape.  Values in below x,y equations can be adjusted to make any heart type you like [ you can also end up with other shapes, like an infinity symbol ]. 
+*/ 
+  for (i = 0; i < 1500; i++) {
+    t += 0.1;
+
+    x = mid_x + s * (30 * (Math.pow(Math.sin(t), 3)));
+    y = (mid_y - 30) + s * -(15 * Math.cos(t) - 10 *
+      Math.cos(2 * t) - 1 * Math.cos(3 * t) -
+      Math.cos(3 * t));
+
+    x += dist * Math.cos(((off_r - rad) / rad) * t);
+    y -= dist * Math.sin(((off_r - rad) / rad) * t);
+
+    canv.moveTo(prevX, prevY);
+    canv.lineTo(x, y);
+    canv.lineWidth = 2;
+    prevX = x;
+    prevY = y;
+  }
+
+  canv.strokeStyle = "hsla(" + (ŭ % 360) + ",100%,50%, 1)";
+  canv.stroke();
+  canv.closePath();
+}
+window.addEventListener('resize', function() {
+  c.width = w = window.innerWidth;
+  c.height = h = window.innerHeight;
+  draw();
+}, false);
+
+window.addEventListener('mousemove', function(e) {
+  morph = calc_(e.clientX / w, 58, 62);
+  targ = calc_(e.clientY / h, -90, 80);
+}, false);
+
+window.addEventListener('touchmove', function(e){
+  morph = calc_(e.touches[0].clientX / w, 58, 62);
+  targ = calc_(e.touches[0].clientY / h, -90, 80);
+  e.preventDefault();
+}, false);
+
+window.addEventListener('mousedown', function() {
+  off_r = Math.random() * 360;
+}, false);
+
+window.addEventListener('touchstart', function(e){
+   off_r = Math.random() * 360;
+}, false);
+
+function run() {
+  window.requestAnimFrame(run);
+  draw();
+}
+run();
+
+</script>
+
 </body>
 </html>
