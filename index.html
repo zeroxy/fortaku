@@ -48,7 +48,7 @@ window.requestAnimFrame = (function() {
     window.oRequestAnimationFrame ||
     window.msRequestAnimationFrame ||
     function(callback) {
-      window.setTimeout(callback, 1000 / 60);
+      window.setTimeout(callback, 1000 / 24);
     };
 })();
 
@@ -66,8 +66,8 @@ var targ = dist;
 var t = 0;
 var prevX, prevY;
 var ŭ = 0;
-var mid_x = w * 0.5;
-var mid_y = h * 0.5;
+var mid_x = w * 0.23;
+var mid_y = h * 0.28;
 
 function calc_(p, a, b) {
   return a + (b - a) * p;
